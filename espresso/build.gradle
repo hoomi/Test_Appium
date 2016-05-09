@@ -19,11 +19,18 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:support-annotations:23.3.0'
+    }
+}
+
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':app')
     testCompile 'junit:junit:4.12'
-
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile project(':app')
+    compile 'com.android.support:recyclerview-v7:23.3.0'
 }
