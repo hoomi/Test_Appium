@@ -1,6 +1,5 @@
 package bskyb.com.espresso;
 
-import android.support.test.espresso.action.ScrollToAction;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -18,7 +17,6 @@ import bskyb.com.espresso.viewactions.ScrollingAction;
 import bskyb.com.hello.appium.MainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
-import static org.hamcrest.Matchers.allOf;
 
 /**
  * Created by hos05 on 5/6/16.
@@ -51,7 +49,7 @@ public class SampleTest {
             public void describeTo(Description description) {
 
             }
-        }).perform(new ScrollingAction());
+        }).perform(new ScrollingAction(14));
     }
 
 
