@@ -1,13 +1,23 @@
 package bskyb.com.hello.appium;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,14 +27,82 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Integer> stringList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
     private ListView listView;
+    private RecyclerView recyclerView;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        showListView();
+//        showRecyclerView();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://bskyb.com.hello.appium/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://bskyb.com.hello.appium/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
+
+    private void showListView() {
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listview);
 //        listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, stringList));
         listView.setAdapter(new MyArrayAdapter(this, android.R.layout.simple_list_item_1, stringList));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, parent.getAdapter().getItem(position) + "", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showRecyclerView() {
+        setContentView(R.layout.activity_main_2);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.setAdapter(new MyAdapter(this, stringList));
     }
 
 
@@ -32,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
         private Random random;
 
-        public MyArrayAdapter(Context context, int resource,List<Integer> objects) {
+        public MyArrayAdapter(Context context, int resource, List<Integer> objects) {
             super(context, resource, objects);
             random = new Random();
         }
@@ -40,13 +118,56 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
-
-            if (position % 3 == 0) {
-                view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, random.nextInt(600)));
-            } else if (position % 5 == 0) {
-                view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, random.nextInt(600)));
-            }
             return view;
+        }
+    }
+
+    private static class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+
+        private final Context context;
+        private final List<Integer> stringList;
+        private final Random random;
+
+        private View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        public MyAdapter(Context context, List<Integer> stringList) {
+
+            this.context = context;
+            this.stringList = stringList;
+            random = new Random();
+        }
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false);
+            view.setOnClickListener(onClickListener);
+            return new MyViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            holder.textView.setText(String.format("%d", stringList.get(position)));
+        }
+
+
+        @Override
+        public int getItemCount() {
+            return stringList == null ? 0 : stringList.size();
+        }
+
+        static class MyViewHolder extends RecyclerView.ViewHolder {
+
+            TextView textView;
+
+            public MyViewHolder(View itemView) {
+                super(itemView);
+                textView = (TextView) itemView.findViewById(android.R.id.text1);
+            }
         }
     }
 

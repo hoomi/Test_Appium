@@ -17,6 +17,7 @@ import bskyb.com.espresso.viewactions.ScrollingAction;
 import bskyb.com.hello.appium.MainActivity;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 
 /**
  * Created by hos05 on 5/6/16.
@@ -49,7 +50,8 @@ public class SampleTest {
             public void describeTo(Description description) {
 
             }
-        }).perform(new ScrollingAction(14));
+        }).perform(new ScrollingAction(40, click()));
+
     }
 
 
