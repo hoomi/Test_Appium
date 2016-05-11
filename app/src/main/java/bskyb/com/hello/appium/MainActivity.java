@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     private void showListView() {
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listview);
-//        listView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, stringList));
         listView.setAdapter(new MyArrayAdapter(this, android.R.layout.simple_list_item_1, stringList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -118,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
+            if (position % 2 == 0) {
+                view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(100, random.nextInt(400))));
+            }
             return view;
         }
     }
@@ -152,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
             holder.textView.setText(String.format("%d", stringList.get(position)));
+            if (position % 2 == 0) {
+                holder.itemView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(100, random.nextInt(400))));
+            }
         }
 
 

@@ -16,7 +16,7 @@ import org.hamcrest.Matcher;
  */
 public class ScrollingAction implements ViewAction {
 
-    private final int SCROLLING_SPEED = 50;
+    private final int SCROLLING_SPEED = 24;
     private final int position;
     private ViewAction viewAction;
     private int topPosition = 0;
@@ -63,9 +63,11 @@ public class ScrollingAction implements ViewAction {
             try {
                 while (view.canScrollVertically(1) && topPosition != position) {
                     int scrollAmount = getScrollAmount((ViewGroup) view);
-                    scrollDown(uiController, scrollAmount, view.getHeight());
-                    uiController.loopMainThreadUntilIdle();
-                    topPosition++;
+                    scrollDown(uiController, scrollAmount, view.getHeight() - 100);
+                    uiController.loopMainThreadForAtLeast(200);
+                    if (isTheTopChildFullyVisible((ViewGroup) view)) {
+                        topPosition++;
+                    }
                 }
             } catch (InjectEventSecurityException e) {
                 e.printStackTrace();
@@ -89,20 +91,26 @@ public class ScrollingAction implements ViewAction {
     }
 
     private void scrollDown(UiController uiController, int scrollBy, int maxTouchArea) throws InjectEventSecurityException {
-        uiController.injectMotionEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
+        long timeStarted = SystemClock.uptimeMillis();
+
+        uiController.injectMotionEvent(MotionEvent.obtain(timeStarted,
                 SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, 0, maxTouchArea, 0));
-        int scrollSpeed = Math.min(SCROLLING_SPEED, scrollBy);
+        int TIME_DISTANCE = 30;
+        long initialActionMove = timeStarted + TIME_DISTANCE;
+        int scrollSpeed = scrollBy / 15;
         for (int i = scrollSpeed; i <= scrollBy; i = i + scrollSpeed) {
-            uiController.injectMotionEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
-                    SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, 0, maxTouchArea - i, 0));
-                    uiController.loopMainThreadForAtLeast(30);
+            initialActionMove += TIME_DISTANCE;
+            uiController.injectMotionEvent(MotionEvent.obtain(timeStarted,
+                    initialActionMove, MotionEvent.ACTION_MOVE, 0, maxTouchArea - i, 0));
+
 
         }
-        uiController.injectMotionEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
-                SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, 0, maxTouchArea - scrollBy, 0));
-        uiController.loopMainThreadForAtLeast(100);
-        uiController.injectMotionEvent(MotionEvent.obtain(SystemClock.uptimeMillis(),
-                SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, 0, maxTouchArea - scrollBy, 0));
+        initialActionMove += TIME_DISTANCE;
+        uiController.injectMotionEvent(MotionEvent.obtain(timeStarted,
+                initialActionMove, MotionEvent.ACTION_MOVE, 0, maxTouchArea - scrollBy, 0));
+        initialActionMove += TIME_DISTANCE;
+        uiController.injectMotionEvent(MotionEvent.obtain(timeStarted,
+                initialActionMove, MotionEvent.ACTION_UP, 0, maxTouchArea - scrollBy - 24, 0));
     }
 
     private int getScrollAmount(ViewGroup viewGroup) {
@@ -112,7 +120,8 @@ public class ScrollingAction implements ViewAction {
         if (viewAfter == null) {
             return viewItself == null ? 0 : viewItself.getTop();
         }
-        return viewAfter.getTop() - viewGroup.getPaddingTop() / 2;
+
+        return viewAfter.getTop();
     }
 
     private int findPositionForTopVisibleView(ViewGroup viewGroup) {
@@ -131,5 +140,12 @@ public class ScrollingAction implements ViewAction {
             viewItself = viewGroup.getChildAt(++i);
         }
         return i;
+    }
+
+    private boolean isTheTopChildFullyVisible(ViewGroup viewGroup) {
+        int i = findPositionForTopVisibleView(viewGroup);
+
+        int top = viewGroup.getChildAt(i).getTop();
+        return top == -120 || top == 24;
     }
 }
