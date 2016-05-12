@@ -50,7 +50,7 @@ public class SampleTest {
             public void describeTo(Description description) {
 
             }
-        }).perform(new ScrollingAction(35, click()));
+        }).perform(new ScrollingAction(14, click()));
 
     }
 

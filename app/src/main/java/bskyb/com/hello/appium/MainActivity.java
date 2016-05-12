@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,8 +88,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showListView() {
+        Random random = new Random();
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.listview);
+        listView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, Math.max(600,random.nextInt(1000))));
         listView.setAdapter(new MyArrayAdapter(this, android.R.layout.simple_list_item_1, stringList));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -94,12 +99,20 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, parent.getAdapter().getItem(position) + "", Toast.LENGTH_LONG).show();
             }
         });
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(MainActivity.class.getName(),"+++++++++++OnTouch: " + event.toString());
+                return false;
+            }
+        });
     }
 
     private void showRecyclerView() {
+        Random random = new Random();
         setContentView(R.layout.activity_main_2);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-
+        recyclerView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, Math.max(600,random.nextInt(1000))));
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(new MyAdapter(this, stringList));
     }
